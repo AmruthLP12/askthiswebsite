@@ -1,16 +1,44 @@
-interface pageProps{
-    params:{
-        url : string | string[] | undefined
-    }
+import ChatWrapper from "@/components/ChatWrapper";
+import { ragChat } from "@/lib/rag-chat";
+import { redis } from "@/lib/redis";
+
+interface pageProps {
+  params: {
+    url: string | string[] | undefined;
+  };
 }
 
-const page = ({params} :pageProps ) => {
+function reconstrucUrl({ url }: { url: string[] }) {
+  const decodedComponents = url.map((component) =>
+    decodeURIComponent(component)
+  );
 
-    console.log(params)
-
-  return (
-    <div>Hello</div>
-  )
+  return decodedComponents.join("/");
 }
 
-export default page
+const page = async ({ params }: pageProps) => {
+  const reconstructedUrl = reconstrucUrl({ url: params.url as string[] });
+
+  const isAlreadyIndexed = await redis.sismember(
+    "indexed-urls",
+    reconstructedUrl
+  );
+
+  const sessionId = "mock-session"
+
+  if (!isAlreadyIndexed) {
+
+
+    await ragChat.context.add({
+      type: "html",
+      source: reconstructedUrl,
+      config: { chunkOverlap: 50, chunkSize: 200 },
+    });
+
+    await redis.sadd("indexed-urls", reconstructedUrl);
+  }
+
+  return <ChatWrapper sessionId={sessionId}/>
+};
+
+export default page;
