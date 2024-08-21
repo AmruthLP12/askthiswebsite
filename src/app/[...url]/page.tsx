@@ -28,6 +28,10 @@ const page = async ({ params }: pageProps) => {
     reconstructedUrl
   );
 
+  const initialMessages = await ragChat.history.getMessages({
+    amount : 10, sessionId
+  })
+
 
 
   if (!isAlreadyIndexed) {
@@ -42,7 +46,7 @@ const page = async ({ params }: pageProps) => {
     await redis.sadd("indexed-urls", reconstructedUrl);
   }
 
-  return <ChatWrapper sessionId={sessionId}/>
+  return <ChatWrapper sessionId={sessionId} initialMessages={initialMessages}/>
 };
 
 export default page;
