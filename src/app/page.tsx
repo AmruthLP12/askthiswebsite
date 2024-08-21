@@ -6,7 +6,7 @@ export default function Home() {
           Welcome to AskThisWebsite
         </h1>
         <p className="text-lg font-semibold text-center">
-          This will only work when you add 'website' next to the deployed link.
+          This will only work when you add &apos;website&apos; next to the deployed link.
         </p>
         <p className="text-sm text-zinc-400 text-center mt-2">
           i.e. https://askthiswebsite-cwa.vercel.app
